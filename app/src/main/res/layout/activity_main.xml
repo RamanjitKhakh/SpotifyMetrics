@@ -11,7 +11,7 @@
     tools:context="com.example.ramanjit.spotifymetrics.MainActivity">
 
     <Button
-        android:text="Button"
+        android:text="Login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/button2"
