@@ -15,8 +15,8 @@ import java.util.Properties;
 public class MainActivity extends AppCompatActivity {
     private Properties props = new Properties();
     private String CLIENT_ID = "";
-    final int REQUEST_CODE = 1138;
-    final String REDIRECT_URI = "spotifymetrics://callback";
+    private static final int REQUEST_CODE = 1138;
+    private static final String REDIRECT_URI = "spotifymetrics://callback";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
             switch (response.getType()) {
                 // Response was successful and contains auth token
                 case TOKEN:
-                    Log.d(MainActivity.class.getName(), "token recieved");
+                    Log.d(MainActivity.class.getName(), "token received");
                     break;
 
                 // Auth flow returned an error
