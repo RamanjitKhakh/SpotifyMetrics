@@ -22,7 +22,8 @@ public class MainActivity extends AppCompatActivity {
             props.load(getAssets().open("keystore.properties"));
         } catch (Exception e) {
         }
-        Log.d(MainActivity.class.getName(), CLIENT_ID);
+        CLIENT_ID = props.getProperty("CLIENT_ID");
+        Log.d(MainActivity.class.getName(), "client key " + CLIENT_ID);
         setContentView(R.layout.activity_main);
     }
 
