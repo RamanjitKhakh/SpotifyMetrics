@@ -10,10 +10,16 @@ import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
 
+import java.io.IOException;
 import java.util.Properties;
 
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 
 public class MainActivity extends AppCompatActivity {
@@ -45,14 +51,47 @@ public class MainActivity extends AppCompatActivity {
         AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);
     }
 
-    public void retrofitSpotify() {
+    public void retrofitSpotify(final String OAuth) {
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.addInterceptor(new Interceptor() {
+            @Override
+            public okhttp3.Response intercept(Chain chain) throws IOException {
+                Request original = chain.request();
+                Request request = original.newBuilder()
+                        .header("Accept", "appliation/json")
+                        .header("Authorization", "Bearer " + OAuth)
+                        .method(original.method(), original.body())
+                        .build();
+                return chain.proceed(request);
+            }
+        });
+
+        OkHttpClient client = httpClient.build();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.spotify.com")
+                .client(client)
                 .build();
 
         SpotifyService service = retrofit.create(SpotifyService.class);
-        Call<ResponseBody> top = service.getTop("artist");
-        Log.d(MainActivity.class.getName(), top.toString());
+        Call<ResponseBody> top = service.getTop("artists");
+        
+        top.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                try {
+                    Log.d(MainActivity.class.getName(), "just about");
+                    Log.d(MainActivity.class.getName(), response.body().string());
+                } catch (Exception e) {
+                    Log.d(MainActivity.class.getName(), "uh oh");
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            }
+        });
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -65,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
                 // Response was successful and contains auth token
                 case TOKEN:
                     Log.d(MainActivity.class.getName(), "token received:"+response.getAccessToken());
-                    //retrofitSpotify();
+                    retrofitSpotify(response.getAccessToken());
                     break;
                 // Auth flow returned an error
                 case ERROR:
