@@ -10,52 +10,12 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.ramanjit.spotifymetrics.MainActivity">
 
-    <TextView
-        android:text="Login"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="25dp"
-        android:layout_marginTop="21dp"
-        android:id="@+id/LoginView" />
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textEmailAddress"
-        android:ems="10"
-        android:layout_below="@+id/LoginView"
-        android:layout_alignStart="@+id/LoginView"
-        android:layout_marginTop="16dp"
-        android:id="@+id/editText" />
-
-    <TextView
-        android:text="Password"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/editText"
-        android:layout_alignStart="@+id/editText"
-        android:id="@+id/PasswordView" />
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPassword"
-        android:ems="10"
-        android:layout_below="@+id/PasswordView"
-        android:layout_alignStart="@+id/PasswordView"
-        android:layout_marginTop="12dp"
-        android:id="@+id/editText2" />
-
     <Button
         android:text="Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/editText2"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="27dp"
         android:id="@+id/button2"
-        android:onClick="loginSpotify"/>
-
+        android:onClick="loginSpotify"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
 </RelativeLayout>
