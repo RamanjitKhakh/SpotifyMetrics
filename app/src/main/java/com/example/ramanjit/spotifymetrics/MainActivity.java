@@ -1,5 +1,6 @@
 package com.example.ramanjit.spotifymetrics;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +15,8 @@ import java.util.Properties;
 public class MainActivity extends AppCompatActivity {
     private Properties props = new Properties();
     private String CLIENT_ID = "";
+    final int REQUEST_CODE = 1138;
+    final String REDIRECT_URI = "spotifymetrics://callback";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,9 +32,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void loginSpotify(View view) {
         // Request code will be used to verify if result comes from the login activity. Can be set to any integer.
-        final int REQUEST_CODE = 1337;
-        final String REDIRECT_URI = "spotifymetrics://callback";
-
         AuthenticationRequest.Builder builder =
                 new AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI);
 
@@ -40,4 +40,33 @@ public class MainActivity extends AppCompatActivity {
 
         AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);
     }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+
+        // Check if result comes from the correct activity
+
+        if (requestCode == REQUEST_CODE) {
+            AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, intent);
+            
+            switch (response.getType()) {
+                // Response was successful and contains auth token
+                case TOKEN:
+                    Log.d(MainActivity.class.getName(), "token recieved");
+                    break;
+
+                // Auth flow returned an error
+                case ERROR:
+                    // Handle error response
+                    break;
+
+                // Most likely auth flow was cancelled
+                default:
+                    // Handle other cases
+            }
+        }
+    }
+
+
+
 }
