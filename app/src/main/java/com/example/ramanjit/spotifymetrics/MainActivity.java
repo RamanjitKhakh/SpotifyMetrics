@@ -1,6 +1,8 @@
 package com.example.ramanjit.spotifymetrics;
 
+import android.content.ComponentName;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -75,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
 
         SpotifyService service = retrofit.create(SpotifyService.class);
         Call<ResponseBody> top = service.getTop("artists");
-        
+
         top.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -92,6 +94,11 @@ public class MainActivity extends AppCompatActivity {
             public void onFailure(Call<ResponseBody> call, Throwable t) {
             }
         });
+    }
+
+    public void logoutSpotify(View view) {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://accounts.spotify.com"));
+        startActivity(browserIntent);
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
