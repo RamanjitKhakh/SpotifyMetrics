@@ -17,7 +17,5 @@ public class Image {
         return url;
     }
 
-    public int getWidth() {
-        return width;
-    }
+    public int getWidth() { return width; }
 }

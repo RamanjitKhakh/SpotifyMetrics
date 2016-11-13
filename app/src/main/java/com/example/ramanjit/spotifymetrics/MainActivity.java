@@ -9,8 +9,10 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.example.ramanjit.spotifymetrics.JsonTypes.Top;
-import com.example.ramanjit.spotifymetrics.JsonTypes.TopItem;
+import com.example.ramanjit.spotifymetrics.JsonTypes.ArtistItem;
+import com.example.ramanjit.spotifymetrics.JsonTypes.TopArtist;
+import com.example.ramanjit.spotifymetrics.JsonTypes.TopTrack;
+import com.example.ramanjit.spotifymetrics.JsonTypes.TrackItem;
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
@@ -32,7 +34,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MainActivity extends AppCompatActivity {
     private Properties props = new Properties();
     private String CLIENT_ID = "";
-    private List<TopItem> topItemList = new ArrayList<TopItem>();
     private static final int REQUEST_CODE = 1138;
     private static final String REDIRECT_URI = "spotifymetrics://callback";
     private ListView listView;
@@ -86,15 +87,17 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         SpotifyService service = retrofit.create(SpotifyService.class);
-        Call<Top> top = service.getTop("artists");
+        Call<TopArtist> tartist = service.getTopArtists();
+        Call<TopTrack> ttrack = service.getTopTracks();
 
-        top.enqueue(new Callback<Top>() {
+        tartist.enqueue(new Callback<TopArtist>() {
             @Override
-            public void onResponse(Call<Top> call, Response<Top> response) {
+            public void onResponse(Call<TopArtist> call, Response<TopArtist> response) {
                 try {
                     String artistsList[] = new String [response.body().getItems().size()];
                     int u = 0;
-                    for (TopItem i : response.body().getItems()) {
+                    for (ArtistItem i : response.body().getItems()) {
+
                         Log.d(MainActivity.class.getName(), i.getName());
                         artistsList[u] = i.getName();
                         u++;
@@ -109,7 +112,25 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<Top> call, Throwable t) {
+            public void onFailure(Call<TopArtist> call, Throwable t) {
+            }
+        });
+        ttrack.enqueue(new Callback<TopTrack>() {
+            @Override
+            public void onResponse(Call<TopTrack> call, Response<TopTrack> response) {
+                try {
+                    Log.d(MainActivity.class.getName(), response.body().getItems().toString());
+                    for (TrackItem i : response.body().getItems()) {
+                        Log.d(MainActivity.class.getName(), i.getName());
+                    }
+                } catch (Exception e) {
+                    Log.d(MainActivity.class.getName(), "uh oh");
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TopTrack> call, Throwable t) {
             }
         });
     }

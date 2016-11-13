@@ -7,10 +7,10 @@ import java.util.List;
  * Created by shua on 11/13/16.
  */
 
-public class Top {
-    private List<TopItem> items = new ArrayList<TopItem>();
+public class TopTrack implements ITop {
+    private List<TrackItem> items = new ArrayList<TrackItem>();
 
-    public List<TopItem> getItems() {
+    public List<TrackItem> getItems() {
         return items;
     }
 }

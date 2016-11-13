@@ -1,8 +1,9 @@
 package com.example.ramanjit.spotifymetrics;
 
-import com.example.ramanjit.spotifymetrics.JsonTypes.Top;
+import com.example.ramanjit.spotifymetrics.JsonTypes.ITop;
+import com.example.ramanjit.spotifymetrics.JsonTypes.TopArtist;
+import com.example.ramanjit.spotifymetrics.JsonTypes.TopTrack;
 
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
@@ -12,6 +13,9 @@ import retrofit2.http.Path;
  */
 
 public interface SpotifyService {
-    @GET("v1/me/top/{type}")
-    Call<Top> getTop(@Path("type") String type);
+    @GET("v1/me/top/artists")
+    Call<TopArtist> getTopArtists();
+
+    @GET("v1/me/top/tracks")
+    Call<TopTrack> getTopTracks();
 }
