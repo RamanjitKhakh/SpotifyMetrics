@@ -8,11 +8,15 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import com.example.ramanjit.spotifymetrics.JsonTypes.Top;
+import com.example.ramanjit.spotifymetrics.JsonTypes.TopItem;
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import okhttp3.Interceptor;
@@ -23,10 +27,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
     private Properties props = new Properties();
     private String CLIENT_ID = "";
+    private List<TopItem> topItemList = new ArrayList<TopItem>();
     private static final int REQUEST_CODE = 1138;
     private static final String REDIRECT_URI = "spotifymetrics://callback";
 
@@ -72,18 +78,20 @@ public class MainActivity extends AppCompatActivity {
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.spotify.com")
+                .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .build();
 
         SpotifyService service = retrofit.create(SpotifyService.class);
-        Call<ResponseBody> top = service.getTop("artists");
+        Call<Top> top = service.getTop("artists");
 
-        top.enqueue(new Callback<ResponseBody>() {
+        top.enqueue(new Callback<Top>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            public void onResponse(Call<Top> call, Response<Top> response) {
                 try {
-                    Log.d(MainActivity.class.getName(), "just about");
-                    Log.d(MainActivity.class.getName(), response.body().string());
+                    for (TopItem i : response.body().getItems()) {
+                        Log.d(MainActivity.class.getName(), i.getName());
+                    }
                 } catch (Exception e) {
                     Log.d(MainActivity.class.getName(), "uh oh");
                     e.printStackTrace();
@@ -91,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<Top> call, Throwable t) {
             }
         });
     }
