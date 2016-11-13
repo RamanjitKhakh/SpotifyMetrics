@@ -7,6 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import com.example.ramanjit.spotifymetrics.JsonTypes.Top;
 import com.example.ramanjit.spotifymetrics.JsonTypes.TopItem;
@@ -35,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private List<TopItem> topItemList = new ArrayList<TopItem>();
     private static final int REQUEST_CODE = 1138;
     private static final String REDIRECT_URI = "spotifymetrics://callback";
+    private ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
         CLIENT_ID = props.getProperty("CLIENT_ID");
         Log.d(MainActivity.class.getName(), "client key " + CLIENT_ID);
         setContentView(R.layout.activity_main);
+        listView = (ListView) findViewById(R.id.ListView);
+
     }
 
     public void loginSpotify(View view) {
@@ -89,9 +94,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<Top> call, Response<Top> response) {
                 try {
+                    String artistsList[] = new String [response.body().getItems().size()];
+                    int u = 0;
                     for (TopItem i : response.body().getItems()) {
                         Log.d(MainActivity.class.getName(), i.getName());
+                        artistsList[u] = i.getName();
+                        u++;
                     }
+
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, android.R.id.text1, artistsList);
+                    listView.setAdapter(adapter);
                 } catch (Exception e) {
                     Log.d(MainActivity.class.getName(), "uh oh");
                     e.printStackTrace();
