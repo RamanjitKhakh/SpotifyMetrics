@@ -1,6 +1,5 @@
 package com.example.ramanjit.spotifymetrics;
 
-import android.content.ComponentName;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
@@ -24,7 +23,6 @@ import java.util.Properties;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -102,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
                         u++;
                     }
 
-                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, android.R.id.text1, artistsList);
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.custom_list,  artistsList);
                     listView.setAdapter(adapter);
                 } catch (Exception e) {
                     Log.d(MainActivity.class.getName(), "uh oh");
