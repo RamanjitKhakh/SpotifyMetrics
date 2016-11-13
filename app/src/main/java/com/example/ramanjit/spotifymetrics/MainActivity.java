@@ -7,7 +7,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ListView;
+import android.widget.Switch;
+import android.widget.ToggleButton;
 
 import com.example.ramanjit.spotifymetrics.JsonTypes.ArtistItem;
 import com.example.ramanjit.spotifymetrics.JsonTypes.TopArtist;
@@ -19,6 +23,8 @@ import com.spotify.sdk.android.authentication.AuthenticationResponse;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
 
@@ -33,9 +39,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
     private Properties props = new Properties();
+    private ToggleButton topwhat;
     private String CLIENT_ID = "";
     private static final int REQUEST_CODE = 1138;
     private static final String REDIRECT_URI = "spotifymetrics://callback";
+    private String OAuth = "";
+    private SpotifyService spotifyService;
     private ListView listView;
 
     @Override
@@ -49,7 +58,16 @@ public class MainActivity extends AppCompatActivity {
         Log.d(MainActivity.class.getName(), "client key " + CLIENT_ID);
         setContentView(R.layout.activity_main);
         listView = (ListView) findViewById(R.id.ListView);
-
+        topwhat = (ToggleButton) findViewById(R.id.topwhat);
+        topwhat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked) {
+                    loadTracks();
+                } else {
+                    loadArtists();
+                }
+            }
+        });
     }
 
     public void loginSpotify(View view) {
@@ -64,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void retrofitSpotify(final String OAuth) {
+        this.OAuth = OAuth;
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         httpClient.addInterceptor(new Interceptor() {
             @Override
@@ -86,24 +105,32 @@ public class MainActivity extends AppCompatActivity {
                 .client(client)
                 .build();
 
-        SpotifyService service = retrofit.create(SpotifyService.class);
-        Call<TopArtist> tartist = service.getTopArtists();
-        Call<TopTrack> ttrack = service.getTopTracks();
+        spotifyService = retrofit.create(SpotifyService.class);
+    }
+
+    public void loadArtists() {
+        Call<TopArtist> tartist = spotifyService.getTopArtists();
 
         tartist.enqueue(new Callback<TopArtist>() {
             @Override
             public void onResponse(Call<TopArtist> call, Response<TopArtist> response) {
                 try {
-                    String artistsList[] = new String [response.body().getItems().size()];
+                    String artistsList[] = new String[response.body().getItems().size()];
+                    List<ArtistItem> artists = response.body().getItems();
+                    Collections.sort(artists, new Comparator<ArtistItem>() {
+                        public int compare(ArtistItem a, ArtistItem b) {
+                            return b.getPopularity() - a.getPopularity();
+                        }
+                    });
                     int u = 0;
-                    for (ArtistItem i : response.body().getItems()) {
+                    for (ArtistItem i : artists) {
 
                         Log.d(MainActivity.class.getName(), i.getName());
-                        artistsList[u] = i.getName();
+                        artistsList[u] = i.getPopularity() + ": " + i.getName();
                         u++;
                     }
 
-                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.custom_list,  artistsList);
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.custom_list, artistsList);
                     listView.setAdapter(adapter);
                 } catch (Exception e) {
                     Log.d(MainActivity.class.getName(), "uh oh");
@@ -115,14 +142,31 @@ public class MainActivity extends AppCompatActivity {
             public void onFailure(Call<TopArtist> call, Throwable t) {
             }
         });
+    }
+
+    public void loadTracks() {
+        Call<TopTrack> ttrack = spotifyService.getTopTracks();
         ttrack.enqueue(new Callback<TopTrack>() {
             @Override
             public void onResponse(Call<TopTrack> call, Response<TopTrack> response) {
                 try {
-                    Log.d(MainActivity.class.getName(), response.body().getItems().toString());
-                    for (TrackItem i : response.body().getItems()) {
+                    String tracksList[] = new String[response.body().getItems().size()];
+                    List<TrackItem> artists = response.body().getItems();
+                    Collections.sort(artists, new Comparator<TrackItem>() {
+                        public int compare(TrackItem a, TrackItem b) {
+                            return b.getPopularity() - a.getPopularity();
+                        }
+                    });
+                    int u = 0;
+                    for (TrackItem i : artists) {
+
                         Log.d(MainActivity.class.getName(), i.getName());
+                        tracksList[u] = i.getPopularity() + ": " + i.getName();
+                        u++;
                     }
+
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.custom_list, tracksList);
+                    listView.setAdapter(adapter);
                 } catch (Exception e) {
                     Log.d(MainActivity.class.getName(), "uh oh");
                     e.printStackTrace();
@@ -151,6 +195,8 @@ public class MainActivity extends AppCompatActivity {
                 case TOKEN:
                     Log.d(MainActivity.class.getName(), "token received:"+response.getAccessToken());
                     retrofitSpotify(response.getAccessToken());
+                    topwhat.setEnabled(true);
+                    loadArtists();
                     break;
                 // Auth flow returned an error
                 case ERROR:
